@@ -6,8 +6,6 @@
 
 ## 挑戰項目
 
-及格 60 分
-
 * 設計出 wireframe+UI FLOW 兩點，並放到網站上便算合格，網站可放至 Github Pages (https://pages.github.com/) 上
 
 ## 加分條件：
