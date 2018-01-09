@@ -51,6 +51,16 @@ export default {
   }
 };
 </script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-49865265-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-49865265-2');
+</script>
+
 
 <style lang="scss">
 @import "~bootstrap/scss/bootstrap";
