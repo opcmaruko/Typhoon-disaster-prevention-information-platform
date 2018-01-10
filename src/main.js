@@ -3,6 +3,8 @@
 import Vue from 'vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import { Map, Marker, load } from 'vue-google-maps'
+import firebase from 'firebase'
 import App from './App'
 import router from './router'
 import store from './store'

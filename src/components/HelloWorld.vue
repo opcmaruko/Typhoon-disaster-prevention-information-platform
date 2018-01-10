@@ -7,6 +7,7 @@
   gtag('config', 'UA-49865265-2');
 </script>
 
+
 <template lang="pug">
   .hello.container
     h1 {{ msg }}
@@ -48,19 +49,87 @@
           th(scope="row") 
             p(class="h6") {{ item.CaseDescription }}
     
+    map(:center.sync="center" :map-type-id.sync="terrian" :zoom.sync="18")
+      marker(v-for="m in markers" :position.sync="m.position")
+     
     
  
 </template>
 
+
 <script>
+import{ Map, Marker, load} from 'vue-google-maps'
+import firebase from 'firebase'
+
+const config = {
+  apiKey: "AIzaSyC3HXUljQGeEd7WqWFuP2l_Hva9DA-qCoI",
+    authDomain: "fir-a1095.firebaseapp.com",
+    databaseURL: "https://fir-a1095.firebaseio.com",
+    projectId: "fir-a1095",
+    storageBucket: "fir-a1095.appspot.com",
+    messagingSenderId: "176562940911"
+};
+load('AIzaSyD4IEtqhh-7ZiCsrcG2ZMi__rRgcqjg8Tk')
+firebase.initializeApp(config);
+
 export default {
+  components: {
+    Map, Marker
+  },
   name: "hello",
   data() {
     return {
       area:"全部",
       msg: "maruko test",
-      listData: []
+      listData: [],
+      center: {
+        lat: 0,
+        lng: 0
+      },
+      // 位置data
+      position: {
+        lat: 0,
+        lng: 0
+      },
+      mapId: '',
+      userId: '',
+      markers: []
     };
+  },
+  // ready:
+  ready () {
+    // get mapID    
+    this.mapId = location.hash.slice(1)
+    if (this.mapId === '') {
+      this.mapId = firebase.database().ref('/maps/').push().key
+      location.hash = this.mapId
+    }
+    // get userID
+    this.userId = localStorage.getItem('fire-geo-userId')
+    if (!this.userId) {
+      localStorage.setItem('fire-geo-userId', this.userId)
+      this.userId = firebase.database().ref('/maps/' + this.mapId).push().key
+    }
+    // bable 語法
+    const ref = firebase.database().ref(`/maps/$(this.mapId)/`)
+    ref.on('child_added', (data) => {
+          const marker = data.val()
+          this.markers.push({
+              key: data.key,
+              position: data.val().position
+          })
+    })
+    ref.on('child_changed', (data) => {
+          let marker = this.markers.find((m) => m.key === data.key)
+          marker.position = data.val().position
+    })
+    navigator.geolocation.watchPosition((position) => {
+      this.position.lat = position.coords.latitude
+      this.position.lng = position.coords.longitude
+      ref.child(this.userId).set({
+          position: this.position  
+      })
+    })
   },
   methods: {
     changearea(item){
@@ -84,7 +153,18 @@ export default {
         .catch(function(error) {
           console.log(error);
         });
-    }
+    },
+    initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: {lat: -34.397, lng: 150.644},
+      zoom: 8
+    });
+  },
+  setCenter(){
+          this.center = this.position
+      }
+  
+  
   },
 
   mounted() {
@@ -92,6 +172,16 @@ export default {
   }
 };
 </script>
+<style>
+body {
+  font-family: Helvetica, sans-serif;
+}
+map {
+  display: block;
+  width: 100%;
+  height: 500px;
+}
+</style>
 
 
 
